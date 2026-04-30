@@ -65,10 +65,50 @@ form?.addEventListener('submit', (e) => {
   window.open(`https://wa.me/${PHONE}?text=${texto}`, '_blank');
 });
 
-// ===== HERO VIDEO FALLBACK =====
-// Se o navegador não tocar o .MOV automaticamente, escurece um pouco mais o overlay
-document.querySelectorAll('video').forEach(v => {
-  v.addEventListener('error', () => {
-    v.style.display = 'none';
-  });
+// ===== AUTOPLAY DE VÍDEOS (fallback mobile) =====
+// iOS Safari e Chrome mobile bloqueiam autoplay em algumas condições
+// (Low Power Mode, Data Saver, primeira visita). Forçamos o play
+// quando o vídeo está pronto e tentamos de novo no primeiro gesto do usuário.
+const autoplayVideos = document.querySelectorAll('video[autoplay]');
+
+const tryPlay = (video) => {
+  video.muted = true;            // garante muted antes do play
+  const promise = video.play();
+  if (promise && typeof promise.catch === 'function') {
+    promise.catch(() => {
+      // bloqueado - aguarda primeiro gesto do usuário e tenta de novo
+      const retry = () => {
+        autoplayVideos.forEach(v => v.play().catch(() => {}));
+        ['touchstart','click','scroll','keydown'].forEach(ev =>
+          document.removeEventListener(ev, retry)
+        );
+      };
+      ['touchstart','click','scroll','keydown'].forEach(ev =>
+        document.addEventListener(ev, retry, { passive: true, once: false })
+      );
+    });
+  }
+};
+
+autoplayVideos.forEach(video => {
+  video.muted = true;
+  video.setAttribute('muted', '');
+  video.setAttribute('playsinline', '');
+  video.setAttribute('webkit-playsinline', '');
+
+  if (video.readyState >= 2) {
+    tryPlay(video);
+  } else {
+    video.addEventListener('loadedmetadata', () => tryPlay(video), { once: true });
+    video.addEventListener('canplay',        () => tryPlay(video), { once: true });
+  }
+
+  video.addEventListener('error', () => { video.style.display = 'none'; });
+});
+
+// retoma reprodução ao voltar pra aba
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    autoplayVideos.forEach(v => { if (v.paused) v.play().catch(() => {}); });
+  }
 });

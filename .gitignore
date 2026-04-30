@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Node (utilizado apenas localmente para conversão de vídeos)
+node_modules/
+package.json
+package-lock.json
+npm-debug.log*
+
+# Vídeos originais (4K HEVC, ~640MB) — usamos as versões .mp4 otimizadas
+*.MOV
+*.mov
+
+# Editores / IDEs
+.vscode/
+.idea/
+.claude/
+*.swp
+*.swo
+
+# Vercel
+.vercel
+.env*.local

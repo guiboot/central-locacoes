@@ -434,6 +434,7 @@ h3 { font-size: clamp(20px, 2.2vw, 24px); margin-bottom: 10px; }
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
   gap: 36px;
+  align-items: start;
 }
 .equip-card {
   border-radius: var(--radius-lg);
@@ -452,6 +453,10 @@ h3 { font-size: clamp(20px, 2.2vw, 24px); margin-bottom: 10px; }
   aspect-ratio: 16 / 10;
   overflow: hidden;
   background: var(--navy-2);
+}
+.equip-video--vertical {
+  aspect-ratio: 9 / 16;
+  max-height: 640px;
 }
 .equip-video video {
   width: 100%;
